@@ -7,10 +7,10 @@ def db2matrix():
     songs = []
     train = []
     test = []
-    with sqlite3.connect('UsersAndSongs.db') as conn:
+    with sqlite3.connect('../data/UsersAndSongs.db') as conn:
         cursor = conn.cursor()
 
-        cursor.execute('SELECT DISTINCT user_name FROM userPlaylist')
+        cursor.execute('SELECT DISTINCT user_name FROM userPlaylist ORDER BY user_name')
         for r in cursor.fetchall():
             users.append(r[0])
         n = len(users)
@@ -20,9 +20,7 @@ def db2matrix():
         m = len(songs)
         
         R = np.zeros((n,m)) # 3974 134427
-        q = '''SELECT user_name, s.song_id, play_count from 
-        (SELECT DISTINCT song_id FROM songs) as s INNER JOIN userPlaylist u
-        ON s.song_id = u.song_id ORDER BY user_name'''
+        q = '''SELECT user_name, song_id, play_count from userPlaylist ORDER BY user_name'''
         cursor.execute(q)
 
         cnt = 0
@@ -54,13 +52,13 @@ def db2matrix():
             cnt += 1
     
     test = np.array(test) # [[(user_name, song_id_idx, play_count)*50]*u]
-
+    print(test[1:11])
     model = NMF(n_components=2, init='random', random_state=0)
     W = model.fit_transform(R)
     H = model.components_
     nR = np.dot(W, H)
-    np.save("mf_test_data.npy", test)
-    np.save("mf_prediction_matrix.npy", nR)
+    np.save("../data/mf_test_data.npy", test)
+    np.save("../data/mf_prediction_matrix.npy", nR)
 
 def main():
     db2matrix()
