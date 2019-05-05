@@ -1,67 +1,82 @@
 import numpy as np
+from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 
-def main():
-    R = np.load("../data/mf_prediction_matrix.npy")
-    test = np.load("../data/mf_test_data.npy")
+def test(data_info):
+    print('')
+    train_data = data_info[0]
+    eval_data = data_info[1]
+    test_data = data_info[2]
+    R = data_info[3]
 
-    x = [i for i in range(1,11)]
+    batch_size = 1024
+    train_auc, train_acc = evaluation(train_data, R, batch_size)
+    eval_auc, eval_acc = evaluation(eval_data, R, batch_size)
+    test_auc, test_acc = evaluation(test_data, R, batch_size)
+
+    print('train auc: %.4f  acc: %.4f    eval auc: %.4f  acc: %.4f    test auc: %.4f  acc: %.4f'
+        % (train_auc, train_acc, eval_auc, eval_acc, test_auc, test_acc))
+    
+def evaluation(data, R, batch_size):
+    start = 0
+    auc_list = []
+    acc_list = []
+    precision_list = [0 for i in range (1,11)]
+    recall_list = [0 for i in range (1,11)]
+    F1_list = [0 for i in range (1,11)]
+    while start < data.shape[0]:
+        feed_size = min(batch_size, data.shape[0]-start)
+        end  = start + feed_size
+        users = data[start:end, 0]
+        items = data[start:end, 1]
+        labels = data[start:end, 2]
+        auc, acc, precision, recall, F1 = eval(data, R, feed_size, users, items, labels)
+        auc_list.append(auc)
+        acc_list.append(acc)
+        precision_list = [sum(x) for x in zip(precision, precision_list)]
+        recall_list = [sum(x) for x in zip(recall, recall_list)]
+        F1_list = [sum(x) for x in zip(F1, F1_list)]
+        start += batch_size
+    print("precision: ", precision_list)
+    print("recall: ", recall_list)
+    print("F1", F1_list)
+    return float(np.mean(auc_list)), float(np.mean(acc_list))
+
+def eval(data, R, feed_size, users, items, labels):
+    scores = R[users, items]
+    # normalize scores
+
+    auc = roc_auc_score(labels, scores)
+
     precision_K = []
     recall_K = []
     F1_K = []
-    for i in x: # K
-        cnt = 0
+        
+    K = [i for i in range(1,11)]
+    for k in K:
         precision = 0
         recall = 0
-        for u in test:
-            user_retrieve_K = []
-            temp_s = 0
-            temp_recall = 0
-            for s in u:
-                if int(s[2]) == 1:
-                    temp_recall += 1 
-                idx = int(s[1])
-                song = R[cnt][idx]
-                user_retrieve_K.append(song)
-            sorted_K = sorted(range(len(user_retrieve_K)), key=lambda k: user_retrieve_K[k])
-            sorted_K = sorted_K[::-1][0:i]
-            for j in range(i): 
-                if int(u[sorted_K[j]][2]) == 1:
-                    temp_s += 1
-            cnt += 1
-            precision += temp_s
-            try:
-                recall += temp_s/temp_recall
-            except:
-                pass
-
-        precision /= R.shape[0]*i
-        recall /= R.shape[0]
+        all_for_user = scores
+        labels_for_user = np.array(labels)
+        sorted_K = sorted(range(len(all_for_user)), key=lambda k: all_for_user[k])[::-1][0:k]
+        labels_K = list(labels_for_user[sorted_K])
+        relevant_K = len(list(filter(lambda x: x==1, labels_K)))
+        precision = relevant_K / (feed_size*k)
+        try:
+            recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user)))*feed_size)
+        except:
+            pass
         F1 = 2*precision*recall/(precision+recall)
         precision_K.append(precision)
         recall_K.append(recall)
         F1_K.append(F1)
 
-    print(precision_K)
-    print(recall_K)
-    print(F1_K)
-    ax1 = plt.gca()
-    ax1.set_xlabel('K')
-    ax1.set_ylabel('precision@K')
-    ax1.set_ylim([0.05,0.30])
-    ax1.plot(x, precision_K, color='r', linewidth=1, alpha=0.6)
+    predictions = [1 if i >= 0.1 else 0 for i in scores]
+    acc = np.mean(np.equal(predictions, labels))
+    return auc, acc, precision_K, recall_K, F1_K
 
-    # ax2 = plt.gca()
-    # ax2.set_xlabel('K')
-    # ax2.set_ylabel('recall@K')
-    # ax2.plot(x, recall_K, color='r', linewidth=1, alpha=0.6)
-
-    # ax3 = plt.gca()
-    # ax3.set_xlabel('K')
-    # ax3.set_ylabel('F1@K')
-    # ax3.plot(x, F1_K, color='r', linewidth=1, alpha=0.6)
-
-    plt.show()
-    # print(model.reconstruction_err_) # 3309.7863205831313
-
-main()
+#     ax1 = plt.gca()
+#     ax1.set_xlabel('K')
+#     ax1.set_ylabel('precision@K')
+#     ax1.set_ylim([0.05,0.30])
+#     ax1.plot(x, precision_K, color='r', linewidth=1, alpha=0.6)
