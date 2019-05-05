@@ -1,9 +1,9 @@
 import argparse
 import numpy as np
 
-RATING_FILE_NAME = dict({'music':"ratings.txt"})
-SEP = dict({"music":'::'})
-THRESHOLD = dict({'music':2})
+RATING_FILE_NAME = "ratings.txt"
+SEP = '::'
+THRESHOLD = 2
 
 
 def read_item_index_to_entity_id_file():
@@ -19,7 +19,7 @@ def read_item_index_to_entity_id_file():
 
 
 def convert_rating():
-    file = '../data/' + DATASET + '/' + RATING_FILE_NAME[DATASET]
+    file = '../data/' + DATASET + '/' + RATING_FILE_NAME
 
     print('reading rating file ...')
     item_set = set(item_index_old2new.values())
@@ -27,7 +27,7 @@ def convert_rating():
     user_neg_ratings = dict()
 
     for line in open(file, encoding='utf-8').readlines()[1:]:
-        array = line.strip().split(SEP[DATASET])
+        array = line.strip().split(SEP)
 
         item_index_old = array[1]
         if item_index_old not in item_index_old2new:  # the item is not in the final item set
@@ -37,7 +37,7 @@ def convert_rating():
         user_index_old = int(array[0])
 
         rating = float(array[2])
-        if rating >= THRESHOLD[DATASET]:
+        if rating >= THRESHOLD:
             if user_index_old not in user_pos_ratings:
                 user_pos_ratings[user_index_old] = set()
             user_pos_ratings[user_index_old].add(item_index)
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     np.random.seed(555)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset', type=str, default='movie', help='which dataset to preprocess')
+    parser.add_argument('-d', '--dataset', type=str, default='01', help='which dataset to preprocess')
     args = parser.parse_args()
     DATASET = args.dataset
 

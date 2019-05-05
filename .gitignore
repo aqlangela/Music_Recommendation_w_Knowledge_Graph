@@ -2,5 +2,5 @@
 .DS_Store
 
 /paper
-/data
+/metadata
 /mf/__pycache__

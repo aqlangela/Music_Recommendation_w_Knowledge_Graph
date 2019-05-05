@@ -88,7 +88,6 @@ class RippleNet(object):
 
             # [batch_size, n_memory]
             probs = tf.squeeze(tf.matmul(Rh, v), axis=2)
-            tf.Print(probs, [probs], "probs: ")
 
             # [batch_size, n_memory]
             probs_normalized = tf.nn.softmax(probs)
@@ -169,7 +168,7 @@ class RippleNet(object):
         precision_K = []
         recall_K = []
         F1_K = []
-        
+
         K = [i for i in range(1,11)]
         for k in K:
             precision = 0
