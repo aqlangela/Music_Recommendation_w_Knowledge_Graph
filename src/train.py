@@ -1,9 +1,11 @@
 import tensorflow as tf
 import numpy as np
 from model import RippleNet
+import pandas as pd
+import pickle
 
 
-def train(args, data_info, show_loss):
+def train(args, data_info, show_loss, dataset):
     train_data = data_info[0]
     eval_data = data_info[1]
     test_data = data_info[2]
@@ -27,9 +29,9 @@ def train(args, data_info, show_loss):
                     print('%.1f%% %.4f' % (start / train_data.shape[0] * 100, loss))
 
             # evaluation
-            train_auc, train_acc = evaluation(sess, args, model, train_data, ripple_set, args.batch_size)
-            eval_auc, eval_acc = evaluation(sess, args, model, eval_data, ripple_set, args.batch_size)
-            test_auc, test_acc = evaluation(sess, args, model, test_data, ripple_set, args.batch_size)
+            train_auc, train_acc = evaluation(sess, args, model, train_data, ripple_set, args.batch_size, dataset)
+            eval_auc, eval_acc = evaluation(sess, args, model, eval_data, ripple_set, args.batch_size, dataset)
+            test_auc, test_acc = evaluation(sess, args, model, test_data, ripple_set, args.batch_size, dataset, True)
 
             print('epoch %d    train auc: %.4f  acc: %.4f    eval auc: %.4f  acc: %.4f    test auc: %.4f  acc: %.4f'
                   % (step, train_auc, train_acc, eval_auc, eval_acc, test_auc, test_acc))
@@ -47,7 +49,7 @@ def get_feed_dict(args, model, data, ripple_set, start, end):
     return feed_dict
 
 
-def evaluation(sess, args, model, data, ripple_set, batch_size):
+def evaluation(sess, args, model, data, ripple_set, batch_size, dataset, test=False):
     start = 0
     auc_list = []
     acc_list = []
@@ -66,7 +68,16 @@ def evaluation(sess, args, model, data, ripple_set, batch_size):
     precision_list = [x/n_batch for x in precision_list]
     recall_list = [x/n_batch for x in recall_list]
     F1_list = [x/n_batch for x in F1_list]
-    print("precision: ", precision_list)
-    print("recall: ", recall_list)
-    print("F1", F1_list)
+    if test: # alicia
+        K = [1,2,5,10,15,20,40,60,80,100]
+        df = pd.DataFrame(columns=['K',"Method","Measure","Value"])
+        for i in range(len(precision_list)):
+            df = df.append({'K':K[i],"Method":"Ripple","Measure":"Precision","Value":precision_list[i]}, ignore_index=True)
+            df = df.append({'K':K[i],"Method":"Ripple","Measure":"Recall","Value":recall_list[i]}, ignore_index=True)
+            df = df.append({'K':K[i],"Method":"Ripple","Measure":"F1","Value":F1_list[i]}, ignore_index=True)
+        ripple_file = open("../Data/"+str(dataset)+"/ripple_result.dat","wb")
+        pickle.dump(df,ripple_file)
+        print("precision: ", precision_list)
+        print("recall: ", recall_list)
+        print("F1", F1_list)
     return float(np.mean(auc_list)), float(np.mean(acc_list))

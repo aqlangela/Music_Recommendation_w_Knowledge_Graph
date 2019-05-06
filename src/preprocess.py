@@ -60,11 +60,11 @@ def convert_rating():
             writer.write('%d\t%d\t1\n' % (user_index, item))
         unwatched_set = item_set - pos_item_set
         if user_index_old in user_neg_ratings:
-            # for item in user_neg_ratings[user_index_old]:
-            #     writer.write('%d\t%d\t0\n' % (user_index, item))
-            unwatched_set -= user_neg_ratings[user_index_old]
-        for item in np.random.choice(list(unwatched_set), size=9*len(pos_item_set), replace=False):
-            writer.write('%d\t%d\t0\n' % (user_index, item))
+            for item in user_neg_ratings[user_index_old]:
+                writer.write('%d\t%d\t0\n' % (user_index, item))
+        #     unwatched_set -= user_neg_ratings[user_index_old]
+        # for item in np.random.choice(list(unwatched_set), size=9*len(pos_item_set), replace=False):
+            # writer.write('%d\t%d\t0\n' % (user_index, item))
     writer.close()
     print('number of users: %d' % user_cnt)
     print('number of items: %d' % len(item_set))

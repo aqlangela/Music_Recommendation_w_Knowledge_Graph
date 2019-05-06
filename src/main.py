@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 from data_loader import load_data
 from train import train
+import sys
 
 np.random.seed(555)
 
@@ -31,7 +32,8 @@ F1 [nan, 0.0008009354124786336, 0.0012007702766816692, 0.001593589070631008, 0.0
 '''
 
 args = parser.parse_args()
+dataset = sys.argv[2]
 
 show_loss = False
 data_info = load_data(args)
-train(args, data_info, show_loss)
+train(args, data_info, show_loss, dataset)

@@ -50,17 +50,15 @@ def evaluation(data, R, batch_size, dataset, test=False):
             df = df.append({'K':K[i],"Method":"MF","Measure":"Precision","Value":precision_list[i]}, ignore_index=True)
             df = df.append({'K':K[i],"Method":"MF","Measure":"Recall","Value":recall_list[i]}, ignore_index=True)
             df = df.append({'K':K[i],"Method":"MF","Measure":"F1","Value":F1_list[i]}, ignore_index=True)
-        ripple_file = open("../data/"+str(dataset)+"/mf_result.dat","wb")
-        pickle.dump(df,ripple_file)
-    print("precision: ", precision_list)
-    print("recall: ", recall_list)
-    print("F1", F1_list)
+        mf_file = open("../data/"+str(dataset)+"/mf_result.dat","wb")
+        pickle.dump(df,mf_file)
+        print("precision: ", precision_list)
+        print("recall: ", recall_list)
+        print("F1", F1_list)
     return float(np.mean(auc_list)), float(np.mean(acc_list))
 
 def eval(data, R, feed_size, users, items, labels):
     scores = R[users, items]
-    # normalize scores
-
     auc = roc_auc_score(labels, scores)
 
     precision_K = []
