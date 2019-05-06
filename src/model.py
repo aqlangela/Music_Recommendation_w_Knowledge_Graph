@@ -178,9 +178,9 @@ class RippleNet(object):
             sorted_K = sorted(range(len(all_for_user)), key=lambda k: all_for_user[k])[::-1][0:k]
             labels_K = list(labels_for_user[sorted_K])
             relevant_K = len(list(filter(lambda x: x==1, labels_K)))
-            precision = relevant_K / (k)
+            precision = relevant_K / (batch_size*k)
             try:
-                recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user))))
+                recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user)))*batch_size)
             except:
                 pass
             try:

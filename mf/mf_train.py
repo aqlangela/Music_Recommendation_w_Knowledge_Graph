@@ -21,7 +21,7 @@ def dataset_split(rating_np):
     left = set(range(n_ratings)) - set(eval_indices)
     test_indices = np.random.choice(list(left), size=int(n_ratings * test_ratio), replace=False)
     train_indices = list(left - set(test_indices))
-    train_indices = np.random.choice(train_indices, size=int(len(train_indices) * 0.3), replace=False)
+    train_indices = np.random.choice(train_indices, size=int(len(train_indices)), replace=False)
     # print(len(train_indices), len(eval_indices), len(test_indices))
 
     train_indices = [i for i in train_indices]

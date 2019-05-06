@@ -64,10 +64,6 @@ def evaluation(sess, args, model, data, ripple_set, batch_size, dataset, test=Fa
         recall_list = [sum(x) for x in zip(recall, recall_list)]
         F1_list = [sum(x) for x in zip(F1, F1_list)]
         start += batch_size
-    n_batch = data.shape[0] // batch_size + 1
-    precision_list = [x/n_batch for x in precision_list]
-    recall_list = [x/n_batch for x in recall_list]
-    F1_list = [x/n_batch for x in F1_list]
     if test: # alicia
         K = [1,2,5,10,15,20,40,60,80,100]
         df = pd.DataFrame(columns=['K',"Method","Measure","Value"])

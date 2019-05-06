@@ -23,8 +23,9 @@ markers=["^", "o"], linestyles=["-", "--"],capsize=0.1)
 plt.title("Precision@K")
 plt.ylabel("Precision@K")
 plt.grid(True)
-plt.savefig("Precision")
+plt.savefig("Precision_"+str(dataset))
 
+plt.clf()
 sns.set(style='darkgrid')
 sns.pointplot(x="K", y="Value",hue="Method", data=recall,
 palette={"Ripple": "r", "MF": "b"},
@@ -32,8 +33,9 @@ markers=["^", "o"], linestyles=["-", "--"],capsize=0.1)
 plt.title("Recall@K")
 plt.ylabel("Recall@K")
 plt.grid(True)
-plt.savefig("Recall")
+plt.savefig("Recall_"+str(dataset))
 
+plt.clf()
 sns.set(style='darkgrid')
 sns.pointplot(x="K", y="Value",hue="Method", data=F1,
 palette={"Ripple": "r", "MF": "b"},
@@ -41,4 +43,4 @@ markers=["^", "o"], linestyles=["-", "--"],capsize=0.1)
 plt.title("F1@K")
 plt.ylabel("F1@K")
 plt.grid(True)
-plt.savefig("F1")
+plt.savefig("F1_"+str(dataset))

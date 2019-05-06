@@ -39,10 +39,6 @@ def evaluation(data, R, batch_size, dataset, test=False):
         recall_list = [sum(x) for x in zip(recall, recall_list)]
         F1_list = [sum(x) for x in zip(F1, F1_list)]
         start += batch_size
-    n_batch = data.shape[0] // batch_size + 1
-    precision_list = [x/n_batch for x in precision_list]
-    recall_list = [x/n_batch for x in recall_list]
-    F1_list = [x/n_batch for x in F1_list]
     if test: # alicia
         K = [1,2,5,10,15,20,40,60,80,100]
         df = pd.DataFrame(columns=['K',"Method","Measure","Value"])
@@ -74,9 +70,9 @@ def eval(data, R, feed_size, users, items, labels):
         sorted_K = sorted(range(len(all_for_user)), key=lambda k: all_for_user[k])[::-1][0:k]
         labels_K = list(labels_for_user[sorted_K])
         relevant_K = len(list(filter(lambda x: x==1, labels_K)))
-        precision = relevant_K / (k)
+        precision = relevant_K / (feed_size*k)
         try:
-            recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user))))
+            recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user)))*feed_size)
         except:
             pass
         try:
