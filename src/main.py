@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 from data_loader import load_data
 from train import train
+import sys#alicia
 
 np.random.seed(555)
 
@@ -14,7 +15,7 @@ parser.add_argument('--kge_weight', type=float, default=0.01, help='weight of th
 parser.add_argument('--l2_weight', type=float, default=1e-6, help='weight of the l2 regularization term')
 parser.add_argument('--lr', type=float, default=0.005, help='learning rate')
 parser.add_argument('--batch_size', type=int, default=1024, help='batch size')
-parser.add_argument('--n_epoch', type=int, default=5, help='the number of epochs')
+parser.add_argument('--n_epoch', type=int, default=1, help='the number of epochs')
 parser.add_argument('--n_memory', type=int, default=32, help='size of ripple set for each hop')
 parser.add_argument('--item_update_mode', type=str, default='plus_transform',
                     help='how to update item at the end of each hop')
@@ -32,6 +33,9 @@ F1 [nan, 0.0008009354124786336, 0.0012007702766816692, 0.001593589070631008, 0.0
 
 args = parser.parse_args()
 
+dataset = sys.argv[2]#alicia
+print(dataset)
+
 show_loss = False
 data_info = load_data(args)
-train(args, data_info, show_loss)
+train(args, data_info, show_loss,dataset)#alicia

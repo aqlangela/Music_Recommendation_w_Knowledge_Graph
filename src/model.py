@@ -169,7 +169,7 @@ class RippleNet(object):
         recall_K = []
         F1_K = []
 
-        K = [i for i in range(1,11)]
+        K = [1,2,5,10,15,20,40,60,80,100]
         for k in K:
             precision = 0
             recall = 0

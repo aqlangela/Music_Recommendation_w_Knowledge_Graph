@@ -1,8 +1,10 @@
 import numpy as np
 from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
+import pandas as pd #alicia
+import pickle #alicia
 
-def test(data_info):
+def test(data_info,dataset):#alicia
     print('')
     train_data = data_info[0]
     eval_data = data_info[1]
@@ -10,14 +12,14 @@ def test(data_info):
     R = data_info[3]
 
     batch_size = 1024
-    train_auc, train_acc = evaluation(train_data, R, batch_size)
-    eval_auc, eval_acc = evaluation(eval_data, R, batch_size)
-    test_auc, test_acc = evaluation(test_data, R, batch_size)
+    train_auc, train_acc = evaluation(train_data, R, batch_size,dataset)#alicia
+    eval_auc, eval_acc = evaluation(eval_data, R, batch_size,dataset)#alicia
+    test_auc, test_acc = evaluation(test_data, R, batch_size,dataset,True)#alicia
 
     print('train auc: %.4f  acc: %.4f    eval auc: %.4f  acc: %.4f    test auc: %.4f  acc: %.4f'
         % (train_auc, train_acc, eval_auc, eval_acc, test_auc, test_acc))
     
-def evaluation(data, R, batch_size):
+def evaluation(data, R, batch_size,dataset,test=False):#alicia
     start = 0
     auc_list = []
     acc_list = []
@@ -37,6 +39,18 @@ def evaluation(data, R, batch_size):
         recall_list = [sum(x) for x in zip(recall, recall_list)]
         F1_list = [sum(x) for x in zip(F1, F1_list)]
         start += batch_size
+    if test:#alicia
+        K = [1,2,5,10,15,20,40,60,80,100]
+        df = pd.DataFrame(columns=['K',"Method","Measure","Value"])
+        for i in range(len(precision_list)):
+            df = df.append({'K':K[i],"Method":"MF","Measure":"Precision","Value":precision_list[i]}, ignore_index=True)
+            df = df.append({'K':K[i],"Method":"MF","Measure":"Recall","Value":recall_list[i]}, ignore_index=True)
+            df = df.append({'K':K[i],"Method":"MF","Measure":"F1","Value":F1_list[i]}, ignore_index=True)
+        mf_file = open("../Data/"+str(dataset)+"/mf_result.dat","wb")
+        pickle.dump(df,mf_file)
+            
+
+
     print("precision: ", precision_list)
     print("recall: ", recall_list)
     print("F1", F1_list)
@@ -52,7 +66,7 @@ def eval(data, R, feed_size, users, items, labels):
     recall_K = []
     F1_K = []
         
-    K = [i for i in range(1,11)]
+    K = [1,2,5,10,15,20,40,60,80,100]
     for k in K:
         precision = 0
         recall = 0
@@ -65,8 +79,11 @@ def eval(data, R, feed_size, users, items, labels):
         try:
             recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user)))*feed_size)
         except:
-            pass
-        F1 = 2*precision*recall/(precision+recall)
+            recall=0
+        try:
+            F1 = 2*precision*recall/(precision+recall)
+        except:
+            F1 = 0
         precision_K.append(precision)
         recall_K.append(recall)
         F1_K.append(F1)

@@ -1,11 +1,14 @@
 import numpy as np
 from sklearn.decomposition import NMF
 
-def load_data():
+def load_data(dataset):#alicia
     print('reading rating file ...')
 
-    rating_np = np.load('../data/ratings_final.npy')
+    rating_np = np.load('../data/'+str(dataset)+'/ratings_final.npy')#alicia
     train_data, eval_data, test_data = dataset_split(rating_np)
+    print("train",train_data.shape)
+    print("eval",eval_data.shape)
+    print("test",test_data.shape)
     R = construct_matrix(rating_np, train_data)
 
     return train_data, eval_data, test_data, R
