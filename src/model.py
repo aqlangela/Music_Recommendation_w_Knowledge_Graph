@@ -169,7 +169,7 @@ class RippleNet(object):
         recall_K = []
         F1_K = []
 
-        K = [i for i in range(1,11)]
+        K = [1,2,5,10,15,20,40,60,80,100]
         for k in K:
             precision = 0
             recall = 0
@@ -178,12 +178,15 @@ class RippleNet(object):
             sorted_K = sorted(range(len(all_for_user)), key=lambda k: all_for_user[k])[::-1][0:k]
             labels_K = list(labels_for_user[sorted_K])
             relevant_K = len(list(filter(lambda x: x==1, labels_K)))
-            precision = relevant_K / (batch_size*k)
+            precision = relevant_K / (k)
             try:
-                recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user)))*batch_size)
+                recall += relevant_K/(len(list(filter(lambda x: x==1, labels_for_user))))
             except:
                 pass
-            F1 = 2*precision*recall/(precision+recall)
+            try:
+                F1 = 2*precision*recall/(precision+recall)
+            except:
+                F1 = 0
             precision_K.append(precision)
             recall_K.append(recall)
             F1_K.append(F1)

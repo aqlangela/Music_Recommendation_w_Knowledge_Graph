@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.decomposition import NMF
 
-def load_data():
+def load_data(dataset):
     print('reading rating file ...')
 
-    rating_np = np.load('../data/ratings_final.npy')
+    rating_np = np.load('../data/'+str(dataset)+'/ratings_final.npy')
     train_data, eval_data, test_data = dataset_split(rating_np)
     R = construct_matrix(rating_np, train_data)
 
@@ -21,6 +21,7 @@ def dataset_split(rating_np):
     left = set(range(n_ratings)) - set(eval_indices)
     test_indices = np.random.choice(list(left), size=int(n_ratings * test_ratio), replace=False)
     train_indices = list(left - set(test_indices))
+    train_indices = np.random.choice(train_indices, size=int(len(train_indices) * 0.3), replace=False)
     # print(len(train_indices), len(eval_indices), len(test_indices))
 
     train_indices = [i for i in train_indices]
